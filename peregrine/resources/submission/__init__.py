@@ -8,8 +8,12 @@ import os
 import flask
 import datamodelutils.models as models
 import peregrine.blueprints
+from peregrine.auth import get_auth_token_from_request
+from peregrine.auth import current_token
+from peregrine.auth import get_projects_with_access
 
 from . import graphql
+
 
 def get_open_project_ids():
     """
@@ -46,26 +50,17 @@ def set_read_access_projects():
     Return:
         None
 
-    Raises:
-        peregrine.errors.AuthError:
-            if ``flask.g.user`` does not exist or if the user is not logged in
-            (does not have a username), then an InvalidTokenError (inheriting
-            from AuthError) is raised by ``FederatedUser.get_project_ids``
-
     Side Effects:
         assigns result from ``get_open_project_ids`` to
         ``flask.g.read_access_projects``.
     """
     if not hasattr(flask.g, 'read_access_projects'):
-        if not hasattr(flask.g, 'user'):
-            raise peregrine.errors.AuthError('user does not exist')
-        flask.g.read_access_projects = flask.g.user.get_project_ids('read')
+        flask.g.read_access_projects = get_projects_with_access(current_token)
         open_project_ids = get_open_project_ids()
         flask.g.read_access_projects.extend(open_project_ids)
 
 
 @peregrine.blueprints.blueprint.route('/graphql', methods=['POST'])
-@peregrine.auth.set_global_user
 def root_graphql_query():
     """
     Run a graphql query.
@@ -74,6 +69,7 @@ def root_graphql_query():
     # projects that the user has read access to is set.
     print("root_graphql_query. Run a graphql query in resource/submission/__init__")
     try:
+        get_auth_token_from_request()
         set_read_access_projects()
     except peregrine.errors.AuthError:
         data = flask.jsonify({'data': {}, 'errors': ['Unauthorized query.']})

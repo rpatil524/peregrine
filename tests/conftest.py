@@ -22,9 +22,9 @@ from peregrine.test_settings import Fernet, HMAC_ENCRYPTION_KEY
 import peregrine.test_settings
 
 from fence.jwt.token import generate_signed_access_token
-from userdatamodel import models as usermd
-from userdatamodel import Base as usermd_base
-from userdatamodel.driver import SQLAlchemyDriver
+from fence import models as usermd
+from fence.models import Base as usermd_base
+from fence.resources.database.driver import SQLAlchemyDriver
 from cdisutilstest.code.storage_client_mock import get_client
 import json
 from peregrine.config import LEGACY_MODE
@@ -238,7 +238,7 @@ def encoded_jwt(private_key, user):
 
     Args:
         private_key (str): private key
-        user (userdatamodel.models.User): user object
+        user (fence.models.User): user object
 
     Return:
         str: JWT containing claims encoded with private key

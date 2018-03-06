@@ -13,6 +13,8 @@ or
 from authutils import AuthDriver
 from authutils import FederatedUser
 from authutils.token import current_token
+from authutils.token import get_projects_with_access
+from authutils.token import get_auth_token_from_request
 # import modules from authutils
 from authutils import dbgap
 from authutils import roles

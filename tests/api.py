@@ -16,7 +16,7 @@ from datamodelutils import models, validators
 import gdcdictionary
 import gdcdatamodel
 from indexclient.client import IndexClient as SignpostClient
-from userdatamodel.driver import SQLAlchemyDriver
+from fence.resources.database.driver import SQLAlchemyDriver
 import sheepdog
 
 import peregrine

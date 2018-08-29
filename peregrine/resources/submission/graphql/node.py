@@ -418,10 +418,13 @@ def resolve_node(self, info, **args):
     # for sq in subqs:
     #     print(sq)
 
+    q = query_with_args(psqlgraph.Node, args, info)
     subqs = [
-        query_with_args(subclass, args, info)#.subquery().select()
+        query_with_args(subclass, args, info).subquery().select()
         for subclass in subclasses
     ]
+    print('############################')
+    print(subqs)
     # print('############################')
     # print(subclasses)
     # print('############################')
@@ -432,8 +435,11 @@ def resolve_node(self, info, **args):
     # print(subqs[0].subquery().select())
     # print('############################')
     # print(subqs[0].all())
+    q = capp.db.nodes(q.entity()).select_entity_from(sa.union_all(*[
+        sq for sq in subqs
+    ]))
     # q = capp.db.nodes(psqlgraph.Node).select_entity_from(sa.union_all(*subqs))
-    q = sa.union_all(*subqs)
+    # q = sa.union_all(*subqs)
     print('############################')
     print(q)
     print('############################')
@@ -442,10 +448,10 @@ def resolve_node(self, info, **args):
 
 
     # q_all = []
-    for subclass in subclasses:
-        q = query_with_args(subclass, args, info)
-        print(q)
-        print('############################')
+    # for subclass in subclasses:
+    #     q = query_with_args(subclass, args, info)
+    #     print(q)
+    #     print('############################')
     #     q_all.extend(q.all())
     #
     # return [__gql_object_classes[n.label](**load_node(n, info, Node.fields_depend_on_columns)) for n in q_all]

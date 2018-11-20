@@ -7,10 +7,14 @@ Defines traversals between node types in the graph and functions to
 execute those traversal queries in the database
 """
 
+from collections import OrderedDict
+import time
+
 import flask
 from psqlgraph import Node, Edge
 import sqlalchemy as sa
-import time
+
+from peregrine.resources.graph import AdjacencyListGraph
 
 terminal_nodes = [
     'annotations',
@@ -136,6 +140,7 @@ def construct_traversals_from_node(root_node, label_to_subclass):
         node, path, visited = to_visit.pop()
         if path:
             path_string = '.'.join(path)
+            # don't repeat a traversal from the same path as before
             if path_string in traversals[node.label]:
                 continue
             traversals[node.label].add(path_string)
@@ -169,14 +174,42 @@ def make_graph_traversal_dict(app_logger):
         n.__name__: n
         for n in Node.get_subclasses()
     }
+    graph = AdjacencyListGraph()
+    for node in Node.get_subclasses():
+        neighbors_dst = {
+            label_to_subclass[edge.__dst_class__]
+            for edge in Edge._get_edges_with_src(node.__name__)
+            if label_to_subclass[edge.__dst_class__]
+        }
+        neighbors_src = {
+            label_to_subclass[edge.__src_class__]
+            for edge in Edge._get_edges_with_dst(node.__name__)
+            if label_to_subclass[edge.__src_class__]
+        }
+        graph.add(node, neighbors_dst)
+        graph.add(node, neighbors_src)
+    def f_node_level(node):
+        return CATEGORY_LEVEL.get(
+            node._dictionary['category'],
+            max(CATEGORY_LEVEL.values()) + 1
+        )
+    traversals = graph.naive_monotonic_traversals(f_node_level)
+
     root_node = Node.get_subclasses()[0]
-    data = {
+    old_traversals = {
         node.label: construct_traversals_from_node(node, label_to_subclass)
         for node in Node.get_subclasses()
     }
+    traversals_strings = {
+        node_src.label: {
+            node_dst.label: ['.'.join(node.label for node in path) for path in paths]
+            for node_dst, paths in node_paths.items()
+        }
+        for node_src, node_paths in traversals.items()
+    }
     end = int(round(time.time() - start))
     app_logger.info('Traversed the graph in {} sec'.format(end))
-    return data
+    return traversals_strings
 
 
 def union_subq_without_path(q, *args, **kwargs):

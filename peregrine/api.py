@@ -1,3 +1,4 @@
+import cProfile
 import os
 import sys
 import time
@@ -12,6 +13,7 @@ from authutils import AuthError
 import datamodelutils
 from dictionaryutils import DataDictionary, dictionary as dict_init
 from cdispyutils.log import get_handler
+from cdispyutils.profiling import Profiler
 
 import peregrine
 from peregrine import dictionary
@@ -23,6 +25,7 @@ from .version_data import VERSION, COMMIT, DICTVERSION, DICTCOMMIT
 # recursion depth is increased for complex graph traversals
 sys.setrecursionlimit(10000)
 DEFAULT_ASYNC_WORKERS = 8
+
 
 def app_register_blueprints(app):
     # TODO: (jsm) deprecate the index endpoints on the root path,
@@ -99,31 +102,43 @@ def dictionary_init(app):
     app.logger.info('Initialized dictionary in {} sec'.format(end))
 
 
-def app_init(app):
-    app.logger.setLevel(logging.INFO)
-
-    # Register duplicates only at runtime
-    app.logger.info('Initializing app')
-    dictionary_init(app)
-
-    app_register_blueprints(app)
-    app_register_duplicate_blueprints(app)
-
-    db_init(app)
-    # exclude es init as it's not used yet
-    # es_init(app)
-    cors_init(app)
+def app_init_traversals(app):
     app.graph_traversals = submission.graphql.make_graph_traversal_dict(app.logger)
+
+
+def app_init_graphql(app):
     app.graphql_schema = submission.graphql.get_schema()
     app.schema_file = submission.generate_schema_file(app.graphql_schema, app.logger)
+
+
+def app_init_secret_key(app):
     try:
         app.secret_key = app.config['FLASK_SECRET_KEY']
     except KeyError:
         app.logger.error(
             'Secret key not set in config! Authentication will not work'
         )
-    async_pool_init(app)
 
+
+def app_init(app):
+    profiler = Profiler(logger=app.logger)
+    app.logger.setLevel(logging.INFO)
+    # Register duplicates only at runtime
+    app.logger.info('Initializing app')
+    init_functions = [
+        dictionary_init,
+        app_register_blueprints,
+        app_register_duplicate_blueprints,
+        db_init,
+        cors_init,
+        app_init_traversals,
+        app_init_graphql,
+        app_init_secret_key,
+        async_pool_init,
+    ]
+    for f in init_functions:
+        profiler.call("init", f, app)
+    profiler.profile_app(app)
     app.logger.info('Initialization complete.')
 
 
@@ -145,6 +160,7 @@ def health_check():
 
     return 'Healthy', 200
 
+
 @app.route('/_version', methods=['GET'])
 def version():
     dictver = {
@@ -158,6 +174,7 @@ def version():
     }
 
     return jsonify(base), 200
+
 
 @app.errorhandler(404)
 def page_not_found(e):

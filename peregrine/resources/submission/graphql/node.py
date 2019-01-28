@@ -679,12 +679,11 @@ def get_node_class_link_resolver_attrs(cls):
             try:
                 target, backref = link['type'], link['backref']
                 # Subquery for neighor connected to node
-                sq = get_authorized_query(target).filter(
-                    getattr(target, backref)
-                    .any(node_id=self.id)).subquery()
-                q = get_authorized_query(target).filter(
-                    target.node_id == sq.c.node_id)
-                q = apply_query_args(q, args, info)
+                q = get_authorized_query(target)
+                association = getattr(target, backref).target_class
+                sq = q.session.query(association.src_id).filter(
+                    association.dst_id == self.id).subquery()
+                q = apply_query_args(q.filter(target.node_id.in_(sq)), args, info)
                 return q
             except Exception as e:
                 capp.logger.exception(e)

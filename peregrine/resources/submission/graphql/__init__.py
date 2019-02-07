@@ -5,6 +5,7 @@ import graphene
 import graphql
 
 from peregrine import dictionary
+import sqlalchemy
 from peregrine.utils.pyutils import (
     log_duration,
 )
@@ -34,6 +35,7 @@ from .transaction import (
 from .traversal import make_graph_traversal_dict
 from .util import (
     set_session_timeout,
+    all_queries,
 )
 
 
@@ -97,6 +99,24 @@ def execute_query(query, variables=None, app=None):
     if app is None:
         app = flask.current_app
 
+    if '__count_cache__' in query:
+        cache = all_queries.get('cache')
+        if cache:
+            rv = {}
+            session_scope = app.db.session_scope()
+            timer = log_duration("GraphQL")
+            with session_scope as session:
+                with timer:
+                    r = session.execute(sqlalchemy.select(list(cache.values()))).fetchone()
+                    for key in cache:
+                        rv[key] = r[key]
+            return rv, []
+        else:
+            all_queries['enabled'] = True
+            all_queries['cache'] = {}
+    elif '__clear_cache__' in query:
+        all_queries['cache'] = {}
+
     # Execute query
     try:
         session_scope = app.db.session_scope()
@@ -109,6 +129,8 @@ def execute_query(query, variables=None, app=None):
                 result = app.graphql_schema.execute(query, variable_values=variables)
     except graphql.error.GraphQLError as e:
         return None, [str(e)]
+    finally:
+        all_queries['enabled'] = False
 
     errors = []
     database_timeout = result is None

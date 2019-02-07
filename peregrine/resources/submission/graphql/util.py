@@ -237,7 +237,9 @@ def get_fields(info):
 
     return collect_fields(node, fragments)
 
-def clean_count(q):
+all_queries = {}
+
+def clean_count(q, key=None):
     """Returns the count from this query without pulling all the columns
 
     This gets the count from a query without doing a subquery
@@ -249,4 +251,6 @@ def clean_count(q):
 
     """
     query_count = q.options(sa.orm.lazyload('*')).statement.with_only_columns([sa.func.count()]).order_by(None)
+    if all_queries.get('enabled'):
+        all_queries['cache'][key] = query_count.label(key)
     return q.session.execute(query_count).scalar()

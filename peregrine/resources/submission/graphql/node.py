@@ -827,7 +827,7 @@ def create_root_fields(fields):
             if 'with_path_to' in args or 'with_path_to_any' in args:
                 q = q.with_entities(sa.distinct(cls.node_id))
             q = q.limit(args.get('first', None))
-            return clean_count(q)
+            return clean_count(q, info.field_name)
 
         count_field = graphene.Field(
             graphene.Int, args=get_node_class_args(cls))

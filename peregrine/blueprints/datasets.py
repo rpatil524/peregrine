@@ -37,12 +37,6 @@ def get_datasets():
     # because graphql can't add structure to group by projects,
     # we labeled the count by project index and later parse it
     # with regex to add structure to response
-    # OrderedDict([('i0_submitted_aligned_reads', 1), ('i1_submitted_aligned_reads', 1)])
-    # OrderedDict([('i0_submitted_aligned_reads', 1), ('i1_submitted_aligned_reads', 1)])
-    # {i0_submitted_aligned_reads: _submitted_aligned_reads_count(project_id: "DEV-DEV") }
-    ##### working query is {i0_submitted_aligned_reads: _submitted_aligned_reads_count(project_id: "DEV-DEV") i1_submitted_aligned_reads: _submitted_aligned_reads_count(project_id: "QA-QA") }
-    # run a query per project
-
     data = OrderedDict()
     for i, project_id in enumerate(projects):
         query = "{"
@@ -58,14 +52,12 @@ def get_datasets():
             + " "
         )
         query += "}"
-        print("Cheking da query")
-        print(query)
-        data1, errors = graphql.execute_query(query, variables={})
-        data.update(data1)
+        partialData, errors = graphql.execute_query(query, variables={})
+        data.update(partialData)
         if errors:
             return flask.jsonify({"data": data, "errors": errors}), 400
     result = {project_id: {} for project_id in projects}
-    print(data)
+
     for name, value in data.items():
         match = re.search("^i(\d+)_(.*)", name)
         index = int(match.group(1))

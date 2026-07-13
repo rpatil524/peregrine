@@ -60,14 +60,14 @@ joserfc = ">=1.6.0"
 
 [[package]]
 name = "authutils"
-version = "7.2.8"
+version = "8.0.0"
 description = "Gen3 auth utility functions"
 optional = false
 python-versions = "<4.0,>=3.13"
 groups = ["main", "dev"]
 files = [
-    {file = "authutils-7.2.8-py3-none-any.whl", hash = "sha256:b2e1f65b725ce6bf8498e404474d70ab6a39e9debbaa3acd5744c5eeb5b08975"},
-    {file = "authutils-7.2.8.tar.gz", hash = "sha256:acd90983e0d442bf8854d39103a5fb39862a99762c7b30b71d70e726df3a3ff3"},
+    {file = "authutils-8.0.0-py3-none-any.whl", hash = "sha256:4781c24dac4e1349288a660fedc6fe78be396ebc53139ed20e138844b7bc4892"},
+    {file = "authutils-8.0.0.tar.gz", hash = "sha256:a4491d9d7d7d240f7ebc15037c45c60c2da092c30068002003337101e31a04b8"},
 ]
 
 [package.dependencies]
@@ -125,18 +125,18 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.43.44"
+version = "1.43.46"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "boto3-1.43.44-py3-none-any.whl", hash = "sha256:621113f7850caec7c8405a07baa26075f700f78844a7f2fdf4d1f879bd3cc3c1"},
-    {file = "boto3-1.43.44.tar.gz", hash = "sha256:035d73afe3e29bf271a5b27b30476ff8eefa5ae36f6702eada8e412d5c1420aa"},
+    {file = "boto3-1.43.46-py3-none-any.whl", hash = "sha256:69453e2c1bcb9fd9806527ab99950cacfc2826cb0dce9a3a0414d19270c06c3c"},
+    {file = "boto3-1.43.46.tar.gz", hash = "sha256:66c0d943b049a46a492ec4ec2ebe73c930b1842c7137bee83aad6d93e95d4d96"},
 ]
 
 [package.dependencies]
-botocore = ">=1.43.44,<1.44.0"
+botocore = ">=1.43.46,<1.44.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.19.0,<0.20.0"
 
@@ -145,14 +145,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.43.44"
+version = "1.43.46"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "botocore-1.43.44-py3-none-any.whl", hash = "sha256:6afb846fd93815133a53baf1578f1d6016ddbeda247623360379758ca2e3f338"},
-    {file = "botocore-1.43.44.tar.gz", hash = "sha256:cc2a95a53efdcf0ce34a51bca28058e72fcc3b10dd625eb1ad900c5ca3eb8bef"},
+    {file = "botocore-1.43.46-py3-none-any.whl", hash = "sha256:cb673891e623ae6e6a1bf24d94ef169504f3eb02584adb5d5bee2f6aae819b60"},
+    {file = "botocore-1.43.46.tar.gz", hash = "sha256:59f2e1ac3cdc66d191cae91c0804bc41847ce817dc8147cf43eaada8f76a5533"},
 ]
 
 [package.dependencies]
@@ -2177,14 +2177,14 @@ files = [
 
 [[package]]
 name = "s3transfer"
-version = "0.19.0"
+version = "0.19.1"
 description = "An Amazon S3 Transfer Manager"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "s3transfer-0.19.0-py3-none-any.whl", hash = "sha256:777cc2415536f1debadb5c2ef7779275d0fc0fe0e042411cdd6caebeb2685262"},
-    {file = "s3transfer-0.19.0.tar.gz", hash = "sha256:ce436931687addc4c1712d52d40b32f53e88315723f107ffa20ba82b05a0f685"},
+    {file = "s3transfer-0.19.1-py3-none-any.whl", hash = "sha256:d5fd7005ee39307455ad5f310b5ea67f4b1960d7fed5b3671ee50c249de675de"},
+    {file = "s3transfer-0.19.1.tar.gz", hash = "sha256:d3d6371dc3f1e5c5427b2b457bcf13bcf87bec334c95aed18642eae61f6926f3"},
 ]
 
 [package.dependencies]
@@ -2216,7 +2216,7 @@ type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.deve
 
 [[package]]
 name = "sheepdog"
-version = "5.2.4"
+version = "5.2.5"
 description = "Gen3 Submission Service"
 optional = false
 python-versions = "^3.13"
@@ -2226,7 +2226,7 @@ develop = false
 
 [package.dependencies]
 authlib = "*"
-authutils = ">=7.2.2,<8"
+authutils = ">=8.0.0"
 boto = ">=2.49.0"
 boto3 = ">=1.40.69"
 cachelib = "^0.13.0"
@@ -2244,9 +2244,9 @@ gen3authz = ">=3.0.0"
 gen3datamodel = ">=3.2.7"
 gen3dictionary = ">=2.0.3"
 gunicorn = ">=21.2.0"
-indexclient = ">=2.1.1"
+indexclient = "*"
 jsonschema = ">=3.2"
-lxml = ">=4.6.5"
+lxml = ">=6.1.0"
 mock = ">=1.0.1"
 psqlgraph = ">=3.1.1"
 pyjwt = ">=2.4.0,<3.0"
@@ -2260,8 +2260,8 @@ urllib3 = ">=2.6.3"
 [package.source]
 type = "git"
 url = "https://git@github.com/uc-cdis/sheepdog.git"
-reference = "2026.04"
-resolved_reference = "198a02ee5fffbe51cf2eaab9daee0ca38516062e"
+reference = "5.2.6"
+resolved_reference = "a7be1e08e485c9b093211ef613213fa180aea7b9"
 
 [[package]]
 name = "simplejson"
@@ -2562,4 +2562,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0"
-content-hash = "e63953ad48b5b92a0686244eaf1f6ae0d2f21fa5954e968e3388eeeba840dc9a"
+content-hash = "657ef7510952275315bdbabac86b1b03c15cb970dc78c13f0be2af7dc50bd135"
